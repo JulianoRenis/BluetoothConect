@@ -13,6 +13,8 @@
       android:id="@+id/btnConectar"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
+      android:layout_marginTop="32dp"
+      android:clickable="false"
       android:text="Conectar"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"

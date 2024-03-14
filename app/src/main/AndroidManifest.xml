@@ -20,6 +20,10 @@
         <activity
             android:name=".ui.ListaDispositivosActivity"
             android:exported="true">
+
+        </activity>
+        <activity android:name=".ui.TesteLcmActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
