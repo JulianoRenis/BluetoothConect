@@ -14,6 +14,8 @@ import br.com.sistemadereparo.lcmbluetooth.factory.BluetoothViewModelFactory
 import br.com.sistemadereparo.lcmbluetooth.model.BluetoothDeviceModel
 import br.com.sistemadereparo.lcmbluetooth.repository.BluetoothRepositoryImpl
 import br.com.sistemadereparo.lcmbluetooth.ui.viewmodel.ListaDispositivosViewModel
+import br.com.sistemadereparo.lcmbluetooth.ui.viewmodel.SharedViewModel
+import br.com.sistemadereparo.lcmbluetooth.util.BluetoothConst.MY_UUID
 import br.com.sistemadereparo.lcmbluetooth.util.BluetoothConst.REQUEST_BLUETOOTH_PERMISSION
 import java.util.UUID
 
@@ -23,6 +25,9 @@ class ListaDispositivosActivity : AppCompatActivity() {
     private val listaDispositivosViewModel: ListaDispositivosViewModel by viewModels {
         BluetoothViewModelFactory(BluetoothRepositoryImpl())
     }
+
+    private val sharedViewModel: SharedViewModel by viewModels()
+
     private val binding by lazy {
         ActivityListaDispositivosBinding.inflate(layoutInflater)
     }
@@ -48,11 +53,13 @@ class ListaDispositivosActivity : AppCompatActivity() {
             val dispositivoSelcionado = dispositivoAdapter.getItem(position)
 
             if (dispositivoSelcionado!=null){
-                val uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // Example UUID for SPP
-                val conectado = listaDispositivosViewModel.connectToDevice(dispositivoSelcionado,uuid)
-                
+                //val uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // Example UUID for SPP
+                val conectado = listaDispositivosViewModel.connectToDevice(dispositivoSelcionado, MY_UUID)
+
                 if (conectado){
                     Toast.makeText(this, "Conectado ao ${dispositivoSelcionado.nome}", Toast.LENGTH_SHORT).show()
+
+
                     val intent = Intent(this, TesteLcmActivity::class.java)
                     intent.putExtra("conectado",conectado)
                     startActivity(intent)

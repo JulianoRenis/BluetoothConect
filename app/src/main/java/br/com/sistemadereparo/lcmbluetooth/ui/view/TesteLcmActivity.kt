@@ -2,6 +2,7 @@ package br.com.sistemadereparo.lcmbluetooth.ui.view
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothSocket
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -14,22 +15,27 @@ import br.com.sistemadereparo.lcmbluetooth.factory.TesteLcmViewModelFactory
 import br.com.sistemadereparo.lcmbluetooth.repository.BluetoothHabilitadoRepositoryImpl
 import br.com.sistemadereparo.lcmbluetooth.ui.viewmodel.TesteLcmViewModel
 import br.com.sistemadereparo.lcmbluetooth.util.BluetoothConst.REQUEST_ENABLE_BLUETOOTH
+import br.com.sistemadereparo.lcmbluetooth.util.BluetoothHelper
 
 class TesteLcmActivity : AppCompatActivity(),BroadcastReceiverBluetoothStatus.BluetoothStatusListener {
 
 
-    private val bluetoothViewModel: TesteLcmViewModel by viewModels {
+    private val testeLcmViewModel: TesteLcmViewModel by viewModels {
         TesteLcmViewModelFactory(BluetoothHabilitadoRepositoryImpl())
     }
     private val binding by lazy { ActivityTesteLcmBinding.inflate(layoutInflater) }
 
     private  var conectado=false
     private lateinit var bluetoothBroadcastReceiver: BroadcastReceiverBluetoothStatus
+    private var bluetoothSocket: BluetoothSocket? = null // Adicione esta variável para manter a referência ao socket
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
         checkBluetoothStatus()
+
         binding.btnConectar.isEnabled=false
 
         bluetoothBroadcastReceiver = BroadcastReceiverBluetoothStatus(this)
@@ -40,9 +46,8 @@ class TesteLcmActivity : AppCompatActivity(),BroadcastReceiverBluetoothStatus.Bl
             registerReceiver(bluetoothBroadcastReceiver, intentFilter)
 
         }
-
         // Check Bluetooth status
-        bluetoothViewModel.checkBluetoothStatus()
+        testeLcmViewModel.checkBluetoothStatus()
 
        val dadosRecebidos= intent.getBooleanExtra("conectado",conectado)
 
@@ -58,11 +63,34 @@ class TesteLcmActivity : AppCompatActivity(),BroadcastReceiverBluetoothStatus.Bl
         binding.btnConectar.setOnClickListener {
             startActivity(Intent(this, ListaDispositivosActivity::class.java))
         }
+        bluetoothSocket = BluetoothHelper.getBluetoothSocket() ?: error("Socket is null")
 
+        enviarDados()
 
+        testeLcmViewModel.receivedData.observe(this, { data ->
+            if (data != null) {
+                val receivedText = String(data)
+                // Update UI with received data
+                binding.btnConectar.text = receivedText
+            }
+        })
+        startReceivingData()
 
 
     }
+
+    private fun enviarDados() {
+        val data = "Hello, Bluetooth!".toByteArray()
+        val success = testeLcmViewModel.sendData(bluetoothSocket!!, data) // Passa a referência do socket
+        if (success) {
+            Toast.makeText(this, "Enviado com sucesso", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Falhou ao enviar", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(bluetoothBroadcastReceiver)
@@ -111,6 +139,24 @@ class TesteLcmActivity : AppCompatActivity(),BroadcastReceiverBluetoothStatus.Bl
 
         }
 
+    }
+
+    private fun startReceivingData() {
+        // Executar recebimento de dados em uma thread separada
+        Thread {
+            while (true) {
+                val receivedData = testeLcmViewModel.receiveData(bluetoothSocket)
+                if (receivedData != null) {
+                    runOnUiThread {
+                        val receivedText = String(receivedData)
+                        // Update UI with received data
+                        binding.btnConectar.text = receivedText
+                    }
+                }
+                // Adicionar um pequeno atraso entre as leituras de dados
+                Thread.sleep(1000)
+            }
+        }.start()
     }
 
 
