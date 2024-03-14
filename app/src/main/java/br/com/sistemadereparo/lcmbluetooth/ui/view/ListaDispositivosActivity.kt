@@ -1,8 +1,6 @@
-package br.com.sistemadereparo.lcmbluetooth.ui
+package br.com.sistemadereparo.lcmbluetooth.ui.view
 
 import android.R
-import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -55,7 +53,7 @@ class ListaDispositivosActivity : AppCompatActivity() {
                 
                 if (conectado){
                     Toast.makeText(this, "Conectado ao ${dispositivoSelcionado.nome}", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this,TesteLcmActivity::class.java)
+                    val intent = Intent(this, TesteLcmActivity::class.java)
                     intent.putExtra("conectado",conectado)
                     startActivity(intent)
                 }else {
@@ -71,6 +69,9 @@ class ListaDispositivosActivity : AppCompatActivity() {
         requestBluetoothPermissions()
         observeDevices()
     }
+
+
+
 
     private fun requestBluetoothPermissions() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
@@ -100,6 +101,8 @@ class ListaDispositivosActivity : AppCompatActivity() {
             }
         })
     }
+
+
 
 
 }
