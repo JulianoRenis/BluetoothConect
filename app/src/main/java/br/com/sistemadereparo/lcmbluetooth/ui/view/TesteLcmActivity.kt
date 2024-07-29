@@ -27,7 +27,7 @@ class TesteLcmActivity : AppCompatActivity(),BroadcastReceiverBluetoothStatus.Bl
 
     private  var conectado=false
     private lateinit var bluetoothBroadcastReceiver: BroadcastReceiverBluetoothStatus
-    private var bluetoothSocket: BluetoothSocket? = null // Adicione esta variável para manter a referência ao socket
+    private lateinit var bluetoothSocket: BluetoothSocket  // Adicione esta variável para manter a referência ao socket
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

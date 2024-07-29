@@ -53,7 +53,7 @@ class ListaDispositivosActivity : AppCompatActivity() {
             val dispositivoSelcionado = dispositivoAdapter.getItem(position)
 
             if (dispositivoSelcionado!=null){
-                //val uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // Example UUID for SPP
+                val uuid: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // Example UUID for SPP
                 val conectado = listaDispositivosViewModel.connectToDevice(dispositivoSelcionado, MY_UUID)
 
                 if (conectado){
